@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LimpaBairro Pro — Denuncie e Organize</title>
+  <meta name="description" content="Ferramenta educativa para denunciar pontos de lixo, organizar mutirões e gerar relatórios para prefeitura." />
+  <style>
+    :root{--bg:#0f1724;--card:#071034;--accent:#06b6d4;--accent2:#7c3aed;--muted:#9fb3c8;--glass:rgba(255,255,255,0.03);--success:#10b981}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial;background:linear-gradient(135deg,#071428 0%, #0b1e2b 100%);color:#e6f0fb;display:flex;align-items:flex-start;justify-content:center;padding:30px}
+    .wrap{width:100%;max-width:1200px}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:white;font-size:22px}
+    h1{margin:0;font-size:24px}
+    .lead{margin:4px 0 0;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 40px rgba(2,6,23,0.6)}
+    label{display:block;font-weight:700;margin-bottom:6px}
+    input[type=text],textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:14px}
+    textarea{min-height:110px}
+    .row{display:flex;gap:8px}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent2));padding:10px 12px;border-radius:10px;border:none;color:white;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .reports{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .report{padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.02)}
+    .meta{font-size:13px;color:var(--muted)}
+    .small{font-size:13px;color:var(--muted)}
+
+    .sidebar .tip{margin-bottom:12px}
+    .kbd{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);font-weight:700}
+
+    footer{margin-top:14px;color:var(--muted);font-size:13px}
+
+    /* lockscreen */
+    .lockscreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(2,6,23,0.9), rgba(2,6,23,0.98));z-index:80}
+    .lockcard{width:min(820px,96%);background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:28px;border-radius:16px;text-align:center}
+    .lockcard h2{margin:0 0 8px}
+    .muted-small{font-size:13px;color:var(--muted)}
+
+    @media (max-width:980px){.grid{grid-template-columns:1fr} .sidebar{order:2}}
+  </style>
+</head>
+<body>
+<!--
+  LimpaBairro Pro - single-file (index.html)
+
+  O que tem aqui:
+  - Tela de bloqueio inicial com aviso e botão "Entrar"
+  - Formulário para enviar denúncia (local, categoria, descrição, foto por URL)
+  - Armazenamento local (localStorage) com versão exportável (CSV/JSON)
+  - Ações rápidas: gerar email pronto, copiar link (encurtado local), gerar PDF simples (via impressão)
+  - Botão para gerar relatórios para prefeitura (CSV)
+  - Comentários e instruções passo-a-passo para publicar no GitHub Pages
+
+  PASSO A PASSO PARA PUBLICAR (resumo):
+
+  1) Crie um repositório no GitHub (por ex.: limpabairro-pro)
+  2) Faça upload do arquivo index.html na raiz do repositório (usando Upload files ou git)
+
+  ---> Se preferir usar o terminal (git):
+    # No seu computador, na pasta onde você salvou index.html
+    git init
+    git add index.html
+    git commit -m "Add LimpaBairro Pro"
+    git branch -M main
+    # Crie o repo no GitHub via site ou use 'gh repo create' (GitHub CLI)
+    git remote add origin https://github.com/SEU_USUARIO/NOME_DO_REPO.git
+    git push -u origin main
+
+  3) No GitHub: vá em Settings -> Pages
+     - Source: selecione 'main' (ou master) e pasta '/ (root)'
+     - Salve.
+  4) Aguarde alguns minutos. A URL será: https://SEU_USUARIO.github.io/NOME_DO_REPO/
+
+  PROBLEMAS COMUNS (soluções):
+   - "Arquivo não encontrado": verifique se existe um arquivo chamado exato 'index.html' na raiz do repo e se a branch selecionada é a correta.
+   - Nome do arquivo com maiúsculas: GitHub diferencia — use 'index.html' em minúsculas.
+   - Se estiver usando pasta /docs, coloque index.html dentro de /docs e selecione /docs como source em Pages.
+   - Limpe cache do navegador ou teste em janela anônima.
+
+  SE QUISER QUE EU GERE UM .ZIP COM ESTE ARQUIVO PARA DOWNLOAD, PEÇA: "Gerar .zip".
+
+  Observação: Este site é um protótipo educativo; para produção, integre com backend, serviços de mapa e APIs de prefeitura.
+-->
+
+  <div class="wrap">
+    <header>
+      <div class="logo">LB</div>
+      <div>
+        <h1>LimpaBairro Pro</h1>
+        <p class="lead">Denuncie pontos de lixo, junte vizinhos e gere relatórios prontos para envio.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main class="card">
+        <h3>Nova denúncia</h3>
+        <form id="form">
+          <label for="place">Local (rua / ponto de referência)</label>
+          <input id="place" type="text" placeholder="Ex.: Rua das Américas, próximo ao número 12" required>
+
+          <label for="category">Categoria</label>
+          <select id="category">
+            <option value="lixo_domestico">Lixo doméstico</option>
+            <option value="entulho">Entulho</option>
+            <option value="eletronico">Resíduo eletrônico</option>
+            <option value="outro">Outro</option>
+          </select>
+
+          <label for="desc">Descrição</label>
+          <textarea id="desc" placeholder="Descreva o problema e o que pode ajudar os responsáveis (ex.: fluxo, cheiro, pragas)" required></textarea>
+
+          <label for="photo">Foto (URL pública) — opcional</label>
+          <input id="photo" type="text" placeholder="Cole a URL da imagem (imgur, drive com link público, CDN)" />
+
+          <div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+            <button class="btn" id="send">Enviar denúncia</button>
+            <button class="btn ghost" id="sample" type="button">Gerar denúncia de teste</button>
+            <div style="flex:1"></div>
+            <button class="btn ghost" id="exportCsv" type="button">Exportar CSV</button>
+          </div>
+        </form>
+
+        <div class="small" style="margin-top:10px">As denúncias ficam salvas apenas no seu navegador (localStorage). Use <span class="kbd">Exportar CSV</span> para enviar à prefeitura.</div>
+
+        <section class="reports" id="reports"></section>
+
+      </main>
+
+      <aside class="card sidebar">
+        <div class="tip">
+          <strong>Como publicar (resumido)</strong>
+          <p class="meta">1) Criar repo no GitHub, 2) adicionar este index.html na raiz, 3) em Settings -> Pages escolher branch main e pasta root.</p>
+        </div>
+
+        <div class="tip">
+          <strong>Uso</strong>
+          <p class="meta">Clique em uma denúncia para copiar o texto, gerar um e-mail pronto ou imprimir (para PDF).</p>
+        </div>
+
+        <div class="tip">
+          <strong>Dicas para coletar provas</strong>
+          <ul class="small">
+            <li>Fotografe com ponto de referência (número/placa).</li>
+            <li>Anote datas e horários.</li>
+            <li>Reúna vizinhos para assinar o relatório.</li>
+          </ul>
+        </div>
+
+        <footer>Protótipo educativo — posso gerar o .zip ou te passar os comandos git exatos.</footer>
+      </aside>
+    </div>
+  </div>
+
+  <div id="lock" class="lockscreen">
+    <div class="lockcard">
+      <h2>Bem-vindo ao LimpaBairro</h2>
+      <p class="muted-small">Este protótipo ajuda a registrar pontos de lixo e gerar relatórios. Clique em Entrar para continuar.</p>
+      <div style="margin-top:16px"><button class="btn" id="enter">Entrar</button></div>
+      <div style="margin-top:12px" class="muted-small">Se você for professor ou gestor, use as instruções no topo do arquivo para publicar no GitHub Pages.</div>
+    </div>
+  </div>
+
+<script>
+// Lógica principal (simples, sem backend) — armazenamento em localStorage
+const KEY = 'limpabairro_pro_reports_v1';
+const form = document.getElementById('form');
+const reportsEl = document.getElementById('reports');
+const exportCsvBtn = document.getElementById('exportCsv');
+const sampleBtn = document.getElementById('sample');
+const lock = document.getElementById('lock');
+const enterBtn = document.getElementById('enter');
+
+function load(){
+  try{ return JSON.parse(localStorage.getItem(KEY) || '[]'); }catch(e){return []}
+}
+function save(arr){ localStorage.setItem(KEY, JSON.stringify(arr)); }
+
+function render(){
+  const arr = load();
+  reportsEl.innerHTML = '';
+  if(arr.length===0){ reportsEl.innerHTML = '<div class="report">Nenhuma denúncia ainda — seja o primeiro a enviar!</div>'; return; }
+  arr.slice().reverse().forEach((r, idx)=>{
+    const div = document.createElement('div'); div.className='report';
+    const date = new Date(r.time).toLocaleString();
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${r.place}</strong><div class="meta">${r.category.replace(/_/g,' ')} • ${date}</div></div><div style='display:flex;gap:8px'><button class='btn ghost' data-idx='${idx}' data-action='email'>Email</button><button class='btn ghost' data-idx='${idx}' data-action='copy'>Copiar</button></div></div><p style="margin-top:8px">${escapeHtml(r.desc)}</p>${r.photo?`<img src='${r.photo}' alt='foto' style='max-width:100%;border-radius:8px;margin-top:8px'>`:''}`;
+    // events
+    div.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = parseInt(btn.dataset.idx,10);
+        const action = btn.dataset.action;
+        const report = load()[i];
+        if(action==='email'){
+          const subject = encodeURIComponent('Denúncia de ponto de lixo — '+report.place);
+          const body = encodeURIComponent(`Olá,%0D%0A%0D%0ASegue denúncia de ponto de lixo:%0D%0A- Local: ${report.place}%0D%0A- Categoria: ${report.category}%0D%0A- Descrição: ${report.desc}%0D%0A- Enviado em: ${new Date(report.time).toLocaleString()}%0D%0A%0D%0APeço providências.`);
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        } else if(action==='copy'){
+          const text = `Denúncia — Local: ${report.place}\nCategoria: ${report.category}\nDescrição: ${report.desc}\nEnviado em: ${new Date(report.time).toLocaleString()}`;
+          navigator.clipboard?.writeText(text).then(()=>alert('Texto copiado para a área de transferência'));
+        }
+      });
+    });
+    reportsEl.appendChild(div);
+  });
+}
+
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  const place = document.getElementById('place').value.trim();
+  const category = document.getElementById('category').value;
+  const desc = document.getElementById('desc').value.trim();
+  const photo = document.getElementById('photo').value.trim();
+  if(!place || !desc){ return alert('Preencha local e descrição'); }
+  const arr = load();
+  arr.push({place,category,desc,photo,time:Date.now()});
+  save(arr);
+  form.reset();
+  render();
+});
+
+exportCsvBtn.addEventListener('click', ()=>{
+  const arr = load();
+  if(arr.length===0) return alert('Nenhuma denúncia para exportar');
+  const csv = ['Local,Categoria,Descrição,Foto,Data']
+    .concat(arr.map(r=>`"${r.place.replace(/"/g,'""')}","${r.category}","${r.desc.replace(/"/g,'""')}","${r.photo}","${new Date(r.time).toLocaleString()}"`))
+    .join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'denuncias_limpa_bairro.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+sampleBtn.addEventListener('click', ()=>{
+  const arr = load();
+  arr.push({place:'Praça Central, perto do coreto',category:'entulho',desc:'Acúmulo de entulho de construção há 2 semanas. Risco para crianças.',photo:'',time:Date.now()});
+  save(arr); render();
+});
+
+enterBtn.addEventListener('click', ()=>{ lock.style.display='none'; });
+
+// inicializar
+render();
+</script>
+</body>
+</html>
